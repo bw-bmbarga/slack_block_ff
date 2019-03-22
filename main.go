@@ -6,21 +6,23 @@
 /*             <nleme@live.fr>                                                */
 /*                                                                            */
 /*   Created:                                                 by elhmn        */
-/*   Updated: Fri Mar 22 12:51:33 2019                        by bmbarga      */
+/*   Updated: Fri Mar 22 13:48:38 2019                        by bmbarga      */
 /*                                                                            */
 /* ************************************************************************** */
 
 package main
 
 import (
-	"encoding/json"
+	// 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 )
 
 const (
-	cPort = "4390"
+	cPort      = "4390"
+	cBlockPath = "./res/block.json"
 )
 
 func root(w http.ResponseWriter, r *http.Request) {
@@ -39,11 +41,16 @@ func analytics(w http.ResponseWriter, r *http.Request) {
 	if text == "" {
 		text = "No data sent !"
 	}
-	data, err := json.Marshal(text)
+
+	block, err := ioutil.ReadFile(cBlockPath)
 	if err != nil {
-		http.Error(w, "Error could not parse json", http.StatusInternalServerError)
+		http.Error(w, "Error : "+err.Error(), http.StatusBadRequest)
+		return
 	}
-	w.Write(data)
+
+	data := "{" + "\"blocks\"" + ":" + string(block) + "}"
+
+	w.Write([]byte(data))
 }
 
 func run() {
