@@ -6,13 +6,14 @@
 /*             <nleme@live.fr>                                                */
 /*                                                                            */
 /*   Created:                                                 by elhmn        */
-/*   Updated: Fri Mar 22 12:38:50 2019                        by bmbarga      */
+/*   Updated: Fri Mar 22 12:51:33 2019                        by bmbarga      */
 /*                                                                            */
 /* ************************************************************************** */
 
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -32,12 +33,17 @@ func analytics(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
+
 	text := r.FormValue("text")
 	if text == "" {
 		text = "No data sent !"
 	}
-
-	w.Write([]byte(text))
+	data, err := json.Marshal(text)
+	if err != nil {
+		http.Error(w, "Error could not parse json", http.StatusInternalServerError)
+	}
+	w.Write(data)
 }
 
 func run() {
